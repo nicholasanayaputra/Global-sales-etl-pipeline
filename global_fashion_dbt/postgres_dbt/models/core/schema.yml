@@ -1,0 +1,142 @@
+version: 2
+
+models:
+  - name: fact_sales
+    description: >
+      Fact table yang berisi transaksi penjualan produk, mencakup informasi pelanggan, produk, diskon, karyawan, dan toko. 
+      Data ini digunakan untuk analisis penjualan dan performa produk.
+    columns:
+      - name: unique_row_id
+        description: "Unique identifier for each sales transaction row."
+      - name: invoice_id
+        description: "Unique identifier for the invoice of the sale."
+      - name: line
+        description: "Line number within the invoice."
+      - name: transaction_timestamp
+        description: "Timestamp of the transaction."
+      - name: customer_id
+        description: "Unique identifier of the customer."
+      - name: full_name
+        description: "Full name of the customer."
+      - name: email
+        description: "Email address of the customer."
+      - name: customer_city
+        description: "City where the customer resides."
+      - name: customer_country
+        description: "Country where the customer resides."
+      - name: gender
+        description: "Gender of the customer."
+      - name: age
+        description: "Age of the customer."
+      - name: job_title
+        description: "Job title of the customer."
+      - name: product_id
+        description: "Unique identifier for the product sold."
+      - name: category
+        description: "Product category."
+      - name: sub_category
+        description: "Sub-category of the product."
+      - name: description_en
+        description: "English description of the product."
+      - name: production_cost
+        description: "Cost of production of the product."
+      - name: color
+        description: "Color of the product."
+      - name: size
+        description: "Size of the product."
+      - name: unit_price
+        description: "Price per unit of the product."
+      - name: quantity
+        description: "Quantity of the product sold."
+      - name: line_total
+        description: "Total for the product line (unit_price * quantity)."
+      - name: discount
+        description: "Discount applied to the product line."
+      - name: calculated_line_total
+        description: "Line total after applying the discount."
+      - name: discount_description
+        description: "Description of the applied discount."
+      - name: store_id
+        description: "Unique identifier for the store where the transaction occurred."
+      - name: store_name
+        description: "Name of the store."
+      - name: store_city
+        description: "City where the store is located."
+      - name: store_country
+        description: "Country where the store is located."
+      - name: employee_id
+        description: "Unique identifier for the employee who handled the transaction."
+      - name: employee_name
+        description: "Name of the employee who handled the transaction."
+      - name: employee_position
+        description: "Job title or position of the employee."
+      - name: currency
+        description: "Currency used for the transaction."
+      - name: currency_symbol
+        description: "Currency symbol for the transaction."
+      - name: transaction_type
+        description: "Type of transaction (e.g., sale, return)."
+      - name: payment_method
+        description: "Payment method used for the transaction."
+      - name: invoice_total
+        description: "Total amount for the entire invoice."
+      
+  - name: dim_products
+    description: >
+      Dimensi produk yang berisi informasi produk, kategori, sub-kategori, dan deskripsi produk dalam berbagai bahasa.
+    columns:
+      - name: product_id
+        description: "Unique identifier for the product."
+      - name: category
+        description: "Category of the product."
+      - name: sub_category
+        description: "Sub-category of the product."
+      - name: description_en
+        description: "English description of the product."
+      - name: production_cost
+        description: "Cost of producing the product."
+      - name: color
+        description: "Color of the product."
+      - name: size
+        description: "Size of the product."
+
+  - name: dim_discounts
+    description: >
+      Dimensi diskon yang berisi informasi terkait diskon berdasarkan kategori produk, sub-kategori, dan periode waktu.
+    columns:
+      - name: discount_id
+        description: "Unique identifier for the discount."
+      - name: category
+        description: "Product category eligible for the discount."
+      - name: sub_category
+        description: "Product sub-category eligible for the discount."
+      - name: start
+        description: "Start date of the discount period."
+      - name: end
+        description: "End date of the discount period."
+      - name: description
+        description: "Description of the discount offer."
+
+  - name: dim_employees
+    description: >
+      Dimensi karyawan yang berisi informasi terkait karyawan yang terlibat dalam transaksi penjualan.
+    columns:
+      - name: employee_id
+        description: "Unique identifier for the employee."
+      - name: full_name
+        description: "Full name of the employee."
+      - name: job_title
+        description: "Job title or position of the employee."
+
+  - name: dim_stores
+    description: >
+      Dimensi toko yang berisi informasi terkait lokasi dan atribut toko.
+    columns:
+      - name: store_id
+        description: "Unique identifier for the store."
+      - name: store_name
+        description: "Name of the store."
+      - name: city
+        description: "City where the store is located."
+      - name: country
+        description: "Country where the store is located."

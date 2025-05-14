@@ -1,0 +1,12 @@
+version: 2
+
+sources:
+  - name: customers_global
+    schema: public
+    tables:
+      - name: customers_retail
+
+  - name: transactions_global
+    schema: public
+    tables:
+      - name: transactions_retail
