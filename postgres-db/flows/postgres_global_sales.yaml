@@ -1,0 +1,226 @@
+id: postgres_fashion_sales
+namespace: personal
+
+inputs:
+  - id: fashion
+    type: SELECT
+    displayName: Select fashion type
+    values: ['transactions', 'customers']
+    defaults: 'transactions'
+
+  - id: number
+    type: SELECT
+    displayName: Select Number
+    values: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"]
+    defaults: "1"
+
+variables:
+  file: "{{inputs.fashion}}_{{inputs.number}}.csv"
+  staging_table: "public.{{inputs.fashion}}_retail_staging"
+  table: "public.{{inputs.fashion}}_retail"
+  data: "{{ outputs.extract.outputFiles[inputs.fashion + '_' + inputs.number + '.csv'] }}"
+
+tasks:
+  - id: set_label
+    type: io.kestra.plugin.core.execution.Labels
+    labels:
+      file: "{{render(vars.file)}}"
+      fashion: "{{inputs.fashion}}"
+
+  - id: extract
+    type: io.kestra.plugin.scripts.shell.Commands
+    outputFiles:
+      - "*.csv"
+    taskRunner:
+      type: io.kestra.plugin.core.runner.Process
+    commands:
+      - wget -qO- https://github.com/nicholasanayaputra/dataset/releases/download/{{inputs.fashion}}/{{inputs.fashion}}_{{inputs.number}}.csv.gz | gunzip > {{inputs.fashion}}_{{inputs.number}}.csv
+
+  - id: if_transactions
+    type: io.kestra.plugin.core.flow.If
+    condition: "{{inputs.fashion == 'transactions'}}"
+    then:
+      - id: transactions_create_table
+        type: io.kestra.plugin.jdbc.postgresql.Queries
+        sql: |
+              CREATE TABLE IF NOT EXISTS {{render(vars.table)}} (
+                  unique_row_id text,
+                  "Invoice ID" text,
+                  "Line" integer,
+                  "Customer ID" integer,
+                  "Product ID" text,
+                  Size text,
+                  Color text,
+                  "Unit Price" double precision,
+                  Quantity integer,
+                  Date TIMESTAMP,
+                  Discount double precision,
+                  "Line Total" double precision,
+                  "Store ID" integer,
+                  "Employee ID" integer,
+                  Currency text,
+                  "Currency Symbol" text,
+                  SKU text,
+                  "Transaction Type" text,
+                  "Payment Method" text,
+                  "Invoice Total" double precision
+                );
+      - id: transactions_create_staging_table
+        type: io.kestra.plugin.jdbc.postgresql.Queries
+        sql: |
+              CREATE TABLE IF NOT EXISTS {{render(vars.staging_table)}} (
+                  unique_row_id text,
+                  "Invoice ID" text,
+                  "Line" integer,
+                  "Customer ID" integer,
+                  "Product ID" text,
+                  Size text,
+                  Color text,
+                  "Unit Price" double precision,
+                  Quantity integer,
+                  Date TIMESTAMP,
+                  Discount double precision,
+                  "Line Total" double precision,
+                  "Store ID" integer,
+                  "Employee ID" integer,
+                  Currency text,
+                  "Currency Symbol" text,
+                  SKU text,
+                  "Transaction Type" text,
+                  "Payment Method" text,
+                  "Invoice Total" double precision
+              );
+
+      - id: transactions_truncate_staging_table
+        type: io.kestra.plugin.jdbc.postgresql.Queries
+        sql: |
+          TRUNCATE TABLE {{render(vars.staging_table)}};
+
+      - id: transactions_copy_in_to_staging_table
+        type: io.kestra.plugin.jdbc.postgresql.CopyIn
+        format: CSV
+        from: "{{render(vars.data)}}"
+        table: "{{render(vars.staging_table)}}"
+        delimiter: ","
+        nullString: ""
+        header: true
+        columns: ["\"Invoice ID\"", "\"Line\"", "\"Customer ID\"", "\"Product ID\"", "Size", "Color", "\"Unit Price\"", "Quantity", "Date", "Discount", "\"Line Total\"", "\"Store ID\"", "\"Employee ID\"", "Currency", "\"Currency Symbol\"", "SKU", "\"Transaction Type\"", "\"Payment Method\"", "\"Invoice Total\""]
+
+      - id: transactions_add_unique_id
+        type: io.kestra.plugin.jdbc.postgresql.Queries
+        sql: |
+          UPDATE {{render(vars.staging_table)}}
+          SET 
+            unique_row_id = md5(
+              COALESCE("Invoice ID", '') ||
+              COALESCE(CAST("Line" AS text), '') ||
+              COALESCE(CAST("Customer ID" AS text), '') ||
+              COALESCE(CAST("Product ID" AS text), '') ||
+              COALESCE(Size, '') ||
+              COALESCE(CAST(Date AS text), '') ||
+              COALESCE(CAST("Unit Price" AS text), '') ||
+              COALESCE(CAST(Quantity AS text), '')
+            );
+
+      - id: transactions_merge_data
+        type: io.kestra.plugin.jdbc.postgresql.Queries
+        sql: |
+          MERGE INTO {{render(vars.table)}} AS T
+          USING {{render(vars.staging_table)}} AS S
+          ON T.unique_row_id = S.unique_row_id
+          WHEN NOT MATCHED THEN
+            INSERT (
+              unique_row_id, "Invoice ID", "Line", "Customer ID", "Product ID", Size, Color, "Unit Price", Quantity, Date, Discount, "Line Total", "Store ID", "Employee ID", Currency, "Currency Symbol", SKU, "Transaction Type", "Payment Method", "Invoice Total"
+            ) 
+            VALUES (
+              S.unique_row_id, S."Invoice ID", S."Line", S."Customer ID", S."Product ID", S.Size, S.Color, S."Unit Price", S.Quantity, S.Date, S.Discount, S."Line Total", S."Store ID", S."Employee ID", S.Currency, S."Currency Symbol", S.SKU, S."Transaction Type", S."Payment Method", S."Invoice Total"
+            );
+
+  - id: if_customers
+    type: io.kestra.plugin.core.flow.If
+    condition: "{{inputs.fashion == 'customers'}}"
+    then:
+      - id: customers_create_table
+        type: io.kestra.plugin.jdbc.postgresql.Queries
+        sql: |
+          CREATE TABLE IF NOT EXISTS {{render(vars.table)}} (
+            unique_row_id text,
+            Customer text,
+            Name text,
+            Email text,
+            Telephone text,
+            City text,
+            Country text,
+            Gender text,
+            "Date Of Birth" TIMESTAMP,
+            "Job Title" text
+          );
+      
+      - id : customers_create_staging_table
+        type: io.kestra.plugin.jdbc.postgresql.Queries
+        sql: | 
+          CREATE TABLE IF NOT EXISTS {{render(vars.staging_table)}} (
+            unique_row_id text,
+            Customer text,
+            Name text,
+            Email text,
+            Telephone text,
+            City text,
+            Country text,
+            Gender text,
+            "Date Of Birth" TIMESTAMP,
+            "Job Title" text
+          );
+
+      - id: customers_truncate_staging_table
+        type: io.kestra.plugin.jdbc.postgresql.Queries
+        sql: |
+          TRUNCATE TABLE {{render(vars.staging_table)}};
+
+      - id: customers_copy_in_to_staging_table
+        type: io.kestra.plugin.jdbc.postgresql.CopyIn
+        format: CSV
+        from: "{{render(vars.data)}}"
+        table: "{{render(vars.staging_table)}}"
+        delimiter: ","
+        nullString: ""
+        header: true
+        columns: ["Customer", "Name", "Email", "Telephone", "City", "Country", "Gender", "\"Date Of Birth\"", "\"Job Title\""]
+
+      - id: customers_add_unique_id
+        type: io.kestra.plugin.jdbc.postgresql.Queries
+        sql: |
+          UPDATE {{render(vars.staging_table)}}
+          SET 
+            unique_row_id = md5(
+              COALESCE(CAST(Customer AS text), '') ||
+              COALESCE(Name, '') ||
+              COALESCE(Email, '') ||
+              COALESCE(CAST("Date Of Birth" AS text), '')
+            );
+
+      - id: customers_merge_data
+        type: io.kestra.plugin.jdbc.postgresql.Queries
+        sql: |
+          MERGE INTO {{render(vars.table)}} AS T
+          USING {{render(vars.staging_table)}} AS S
+          ON T.unique_row_id = S.unique_row_id
+          WHEN NOT MATCHED THEN
+            INSERT (
+              unique_row_id, Customer, Name, Email, Telephone, City, Country, Gender, "Date Of Birth", "Job Title"
+            ) 
+            VALUES (
+              S.unique_row_id, S.Customer, S.Name, S.Email, S.Telephone, S.City, S.Country, S.Gender, S."Date Of Birth", S."Job Title"
+            );
+
+  - id: purge_files
+    type: io.kestra.plugin.core.storage.PurgeCurrentExecutionFiles
+    description: This will remove output files. If you'd like to explore Kestra outputs, disable it.
+
+pluginDefaults:
+  - type: io.kestra.plugin.jdbc.postgresql
+    values:
+      url: jdbc:postgresql://host.docker.internal:5432/global_fashion_db
+      username: postgres
+      password: akujanji45
+
