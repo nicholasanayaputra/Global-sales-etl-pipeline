@@ -1,22 +1,20 @@
-
+#!/bin/bash
 set -e
 
-TRANSACTIONS_TYPE=$1 # "transactions"
-NUMBER=$1
+TRANSACTIONS_TYPE=$1   # misal: "transactions" atau "customers"
+START=$2               # angka awal
+END=$3                 # angka akhir
 
 URL_PREFIX="https://github.com/nicholasanayaputra/dataset/releases/download"
 
-for MONTH in {1..11}; do
-  FMONTH=`printf "%02d" ${MONTH}`
-
-  URL="${URL_PREFIX}/${TRANSACTIONS_TYPE}/${TRANSACTIONS_TYPE}_RETAIL_${NUMBER}.csv.gz"
+for NUMBER in $(seq $START $END); do
+  FILE_NAME="${TRANSACTIONS_TYPE}_${NUMBER}.csv.gz"
+  URL="${URL_PREFIX}/${TRANSACTIONS_TYPE}/${FILE_NAME}"
 
   LOCAL_PREFIX="data/raw/${TRANSACTIONS_TYPE}/${NUMBER}"
-  LOCAL_FILE="${TRANSACTIONS_TYPE}_tripdata_${NUMBER}.csv.gz"
-  LOCAL_PATH="${LOCAL_PREFIX}/${LOCAL_FILE}"
+  LOCAL_PATH="${LOCAL_PREFIX}/${FILE_NAME}"
 
-  echo "downloading ${URL} to ${LOCAL_PATH}"
-  mkdir -p ${LOCAL_PREFIX}
-  curl -L ${URL} -o ${LOCAL_PATH}
-
+  echo "Downloading ${URL} to ${LOCAL_PATH}"
+  mkdir -p "${LOCAL_PREFIX}"
+  curl -L "${URL}" -o "${LOCAL_PATH}"
 done
