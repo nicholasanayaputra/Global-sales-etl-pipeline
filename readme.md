@@ -4,6 +4,23 @@ This project demonstrates a complete end-to-end data engineering pipeline for gl
 
 ---
 
+## 🧠 Business Understanding
+
+### 🧩 Problem Statements
+- How to integrate various global retail data sources into a reliable and scalable pipeline system?
+- How to understand sales patterns based on location, time, product category, and discount impact?
+- How to present sales information in an interactive dashboard to support business decision-making?
+
+### 🎯 Goals
+- Build an end-to-end ETL pipeline that processes data from data lake to data warehouse using Kestra, dbt, and PostgreSQL/Snowflake.
+- Provide interactive and informative visualizations through Metabase to help stakeholders understand business performance.
+- Deliver insights based on data analysis related to product sales, discount effectiveness, and branch performance.
+
+### ✅ Solution Statements
+- The pipeline is built using Kestra for ETL orchestration, Apache Spark for initial transformation, and dbt for data modeling.
+- Data is stored in PostgreSQL/Snowflake and then visualized using Metabase as an analytics dashboard.
+- Analysis is performed on fact and dimension models (product, customer, time, store) to identify trends, anomalies, and business optimization opportunities.
+
 ## 🧰 Tech Stack
 
 - **Orchestration**: [Kestra](https://kestra.io/)
