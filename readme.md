@@ -17,7 +17,7 @@ This project demonstrates a complete end-to-end data engineering pipeline for gl
 ---
 
 ## 🗂️ Project Structure
-.
+```
 pipeline_global_sales/
 ├── data/ # Raw input datasets
 │ └── global_fashion_dbt/ # dbt project directory
@@ -30,7 +30,7 @@ pipeline_global_sales/
 ├── download_data.sh # Script to fetch or move datasets
 ├── Read CSV with Spark.ipynb # Spark ETL notebook (manual testing)
 ├── readme.md # Project documentation
-
+```
 ---
 
 ## 🔁 Workflow Overview
@@ -78,7 +78,7 @@ The visualization dashboard below was created using **Metabase** and showcases:
 - Sales by Age Group and Gender
 - Multi-Currency Analysis by Country
 
-![Global Sales Dashboard](https://user-images.githubusercontent.com/12345678/171234567-abc12345-xyz890.jpg)
+<img src="https://user-images.githubusercontent.com/12345678/171234567-abc12345-xyz890.jpg" alt="Global Sales Dashboard" width="600"/>
 
 ---
 
