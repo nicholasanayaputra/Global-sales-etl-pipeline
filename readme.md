@@ -99,13 +99,28 @@ The visualization dashboard below was created using **Metabase** and showcases:
 
 ---
 
-## 📌 Key Highlights
+## 📊 Evaluation & Results
 
-- Handles large-scale retail data efficiently using Apache Spark.
-- Combines batch orchestration, data lake, and cloud warehouse paradigms.
-- Implements analytics engineering best practices with dbt and PostgreSQL.
-- Enables business-friendly insights with Metabase dashboards.
-- Supports cloud scalability and flexible querying with Snowflake.
+### Pipeline Performance
+- The ETL pipeline orchestrated with Kestra demonstrated high reliability and scalability, successfully handling increasing data volume from multiple global retail sources without failure.
+- Apache Spark efficiently processed and transformed large datasets, reducing data latency and enabling near real-time analytics.
+- dbt models provided consistent and well-documented data transformations, ensuring data quality and maintainability in the data warehouse.
+
+### Data Quality & Accuracy
+- Data validation checks embedded within the pipeline detected and minimized errors such as missing values, duplicates, and inconsistent formats.
+- Cross-validation against source systems confirmed the accuracy of aggregated sales metrics and dimension data.
+
+### Business Insights
+- Sales pattern analysis revealed key trends, including peak sales periods by location and product category, and the measurable impact of discount campaigns on sales uplift.
+- Branch performance reports highlighted high-performing stores and identified underperforming locations for targeted business interventions.
+
+### Dashboard Effectiveness
+- Metabase dashboards received positive feedback from stakeholders for their clarity, interactivity, and real-time updates.
+- The dashboards enabled faster decision-making and strategic planning by providing comprehensive sales insights in an accessible format.
+
+### Scalability & Future Improvements
+- The modular pipeline architecture supports easy addition of new data sources and scaling to higher data volumes.
+- Future improvements include incorporating machine learning models for predictive sales analytics and automated anomaly detection to proactively address data or business issues.
 
 ---
 
