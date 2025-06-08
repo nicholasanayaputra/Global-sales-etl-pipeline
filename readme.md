@@ -78,7 +78,7 @@ The visualization dashboard below was created using **Metabase** and showcases:
 - Sales by Age Group and Gender
 - Multi-Currency Analysis by Country
 
-<img src="https://user-images.githubusercontent.com/12345678/171234567-abc12345-xyz890.jpg" alt="Global Sales Dashboard" width="600"/>
+<img src="https://github.com/user-attachments/assets/b43c9f26-a453-4e02-b32e-07cab95c8d7b" width="800" />
 
 ---
 
